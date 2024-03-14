@@ -1,113 +1,550 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { Formik, Form, Field, ErrorMessage, FieldArray } from "formik";
+import * as Yup from "yup";
+import { toast } from "sonner";
+import { Toaster } from "sonner";
+import AddData from "@/actions/AddData";
+import Link from "next/link";
+
+export default function SurveyForm() {
+  const validationSchema = Yup.object({
+    doorNumber: Yup.string().required("Door number is required"),
+    numberOfPeople: Yup.number()
+      .required("Number of people is required")
+      .positive("Must be a positive number")
+      .integer("Must be a whole number"),
+    numberOfVoterID: Yup.number()
+      .notRequired()
+      .integer("Must be a whole number")
+      .min(0, "Number of Voter IDs cannot be negative"),
+    numberOfWomen: Yup.number()
+      .notRequired()
+      .positive("Must be a positive number")
+      .min(0, "Number of women cannot be negative"),
+    womenDetails: Yup.array().of(
+      Yup.object().shape({
+        name: Yup.string().required("Name is required"),
+        educationQualification: Yup.string().required(
+          "Education qualification is required"
+        ),
+        dropout: Yup.boolean().required("Dropout status is required"),
+        dropoutReason: Yup.string().when("dropout", {
+          is: true,
+          then: () => Yup.string().required("Please provide dropout reason"),
+          otherwise: () => Yup.string().notRequired(),
+        }),
+        continueEducation: Yup.boolean().notRequired(),
+        voterID: Yup.boolean().required("Voter ID status is required"),
+        voterIDReason: Yup.string().when("voterID", {
+          is: false,
+          then: () =>
+            Yup.string().required(
+              "Please provide reason for not having a Voter ID"
+            ),
+          otherwise: () => Yup.string().notRequired(),
+        }),
+      })
+    ),
+    rationCardType: Yup.string().required("Ration Card Type is required"),
+    governmentAssistance: Yup.string().notRequired(),
+    contactNumber: Yup.string().required("Contact Number is required"),
+    hasUdyogYojanaCard: Yup.boolean().required("Udyog Yojana Card is required"),
+  });
+
+  const onSubmit = (values: any) => {
+    toast.promise(AddData(values), {
+      loading: "Adding Data to Database...",
+      success: (data) => {
+        return `Data saved Successfully`;
+      },
+      error: "Error",
+    });
+  };
+  interface WomanDetails {
+    name: string;
+    educationQualification: string;
+    dropout: boolean;
+    dropoutReason?: string;
+    continueEducation?: boolean;
+    voterID: boolean;
+    voterIDReason?: string;
+  }
+  const initialValues: {
+    doorNumber: string;
+    numberOfPeople: string;
+    numberOfVoterID: number;
+    numberOfWomen: number;
+    womenDetails: WomanDetails[];
+    rationCardType: string;
+    governmentAssistance: string;
+    contactNumber: string;
+    hasUdyogYojanaCard: boolean;
+  } = {
+    doorNumber: "",
+    numberOfPeople: "",
+    numberOfVoterID: 0,
+    numberOfWomen: 0,
+    womenDetails: [],
+    rationCardType: "",
+    governmentAssistance: "",
+    contactNumber: "",
+    hasUdyogYojanaCard: false,
+  };
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <div className="flex justify-center items-start h-screen my-4">
+      <Toaster position="top-center" />
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={onSubmit}
+      >
+        {({ values }) => (
+          <Form className="bg-[#fefefe] shadow-md rounded px-8 pt-6 pb-8 mb-4 max-w-lg mx-auto">
+            <Link href="/view">
+              <p className="text-gray-900 text-right text-sm underline underline-offset-4 ">
+                View Data
+              </p>
+            </Link>
+            <h1 className="text-2xl text-gray-900 font-semibold pb-6">
+              Rural Data Collection
+            </h1>
+            <div className="mb-4">
+              <label
+                htmlFor="doorNumber"
+                className="block mb-2 text-sm font-medium text-gray-900 "
+              >
+                Door Number
+              </label>
+              <Field
+                type="text"
+                id="doorNumber"
+                name="doorNumber"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+              />
+              <ErrorMessage
+                name="doorNumber"
+                component="div"
+                className="text-red-500 text-xs italic"
+              />
+            </div>
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+            <div className="mb-4">
+              <label
+                htmlFor="numberOfPeople"
+                className="block mb-2 text-sm font-medium text-gray-900 "
+              >
+                Number of People in the House
+              </label>
+              <Field
+                type="number"
+                id="numberOfPeople"
+                name="numberOfPeople"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+              />
+              <ErrorMessage
+                name="numberOfPeople"
+                component="div"
+                className="text-red-500 text-xs italic"
+              />
+            </div>
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+            <div className="mb-4">
+              <label
+                htmlFor="numberOfPeople"
+                className="block mb-2 text-sm font-medium text-gray-900 "
+              >
+                Number of People with Voter ID
+              </label>
+              <Field
+                type="number"
+                id="numberOfVoterID"
+                name="numberOfVoterID"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+              />
+              <ErrorMessage
+                name="numberOfVoterID"
+                component="div"
+                className="text-red-500 text-xs italic"
+              />
+            </div>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+            <div className="mb-4">
+              <label
+                htmlFor="numberOfWomen"
+                className="block mb-2 text-sm font-medium text-gray-900 "
+              >
+                Number of Women in the House
+              </label>
+              <Field
+                type="number"
+                id="numberOfWomen"
+                name="numberOfWomen"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+              />
+              <ErrorMessage
+                name="numberOfWomen"
+                component="div"
+                className="text-red-500 text-xs italic"
+              />
+            </div>
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
+            <FieldArray name="womenDetails">
+              {({ push, remove }) => (
+                <div>
+                  {Array.from({
+                    length: parseInt(values.numberOfWomen.toString()) || 0,
+                  }).map((_, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-300 rounded-lg p-4 mb-4"
+                    >
+                      <h3 className="text-lg font-semibold mb-2 text-gray-900">
+                        Woman {index + 1} Details
+                      </h3>
+                      <div className="mb-4">
+                        <label
+                          htmlFor={`womenDetails.${index}.name`}
+                          className="block mb-2 text-sm font-medium text-gray-900"
+                        >
+                          Name
+                        </label>
+                        <Field
+                          type="text"
+                          id={`womenDetails.${index}.name`}
+                          name={`womenDetails.${index}.name`}
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        />
+                        <ErrorMessage
+                          name={`womenDetails.${index}.name`}
+                          component="div"
+                          className="text-red-500 text-xs italic"
+                        />
+                      </div>
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+                      <div className="mb-4">
+                        <label
+                          htmlFor={`womenDetails.${index}.educationQualification`}
+                          className="block mb-2 text-sm font-medium text-gray-900"
+                        >
+                          Highest Education Qualification
+                        </label>
+                        <Field
+                          as="select"
+                          id={`womenDetails.${index}.educationQualification`}
+                          name={`womenDetails.${index}.educationQualification`}
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        >
+                          <option value="">Select</option>
+                          <option value="None">None</option>
+
+                          <option value="Primary School">Primary School</option>
+                          <option value="Secondary School">
+                            Secondary School
+                          </option>
+                          <option value="High School">High School</option>
+                          <option value="Diploma">Diploma</option>
+                          <option value="Undergraduate">Undergraduate</option>
+                          <option value="Postgraduate">Postgraduate</option>
+                        </Field>
+                        <ErrorMessage
+                          name={`womenDetails.${index}.educationQualification`}
+                          component="div"
+                          className="text-red-500 text-xs italic"
+                        />
+                      </div>
+
+                      <div className="mb-4">
+                        <label className="block mb-2 text-sm font-medium text-gray-900">
+                          Did they drop out of college?
+                        </label>
+                        <div className="flex items-center">
+                          <Field
+                            type="radio"
+                            id={`womenDetails.${index}.dropout`}
+                            name={`womenDetails.${index}.dropout`}
+                            value="true"
+                            className="mr-2"
+                          />
+                          <label
+                            htmlFor={`womenDetails.${index}.dropout`}
+                            className="text-sm text-gray-900"
+                          >
+                            Yes
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <Field
+                            type="radio"
+                            id={`womenDetails.${index}.dropout`}
+                            name={`womenDetails.${index}.dropout`}
+                            value="false"
+                            className="mr-2"
+                          />
+                          <label
+                            htmlFor={`womenDetails.${index}.dropout`}
+                            className="text-sm text-gray-900"
+                          >
+                            No
+                          </label>
+                        </div>
+                        <ErrorMessage
+                          name={`womenDetails.${index}.dropout`}
+                          component="div"
+                          className="text-red-500 text-xs italic"
+                        />
+                      </div>
+
+                      {values.womenDetails[index]?.dropout &&
+                        values.womenDetails[index]?.dropout.toString() ===
+                          "true" && (
+                          <div className="mb-4">
+                            <label
+                              htmlFor={`womenDetails.${index}.dropoutReason`}
+                              className="block mb-2 text-sm font-medium text-gray-900"
+                            >
+                              Reason for Dropout
+                            </label>
+                            <Field
+                              type="text"
+                              id={`womenDetails.${index}.dropoutReason`}
+                              name={`womenDetails.${index}.dropoutReason`}
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            />
+                            <ErrorMessage
+                              name={`womenDetails.${index}.dropoutReason`}
+                              component="div"
+                              className="text-red-500 text-xs italic"
+                            />
+                          </div>
+                        )}
+                      {values.womenDetails[index]?.dropout &&
+                        values.womenDetails[index]?.dropout.toString() ===
+                          "true" && (
+                          <div className="mb-4">
+                            <label className="block mb-2 text-sm font-medium text-gray-900">
+                              Do they plan to continue their education?
+                            </label>
+                            <div className="flex items-center">
+                              <Field
+                                type="radio"
+                                id={`womenDetails.${index}.continueEducation`}
+                                name={`womenDetails.${index}.continueEducation`}
+                                value="true"
+                                className="mr-2"
+                              />
+                              <label
+                                htmlFor={`womenDetails.${index}.continueEducation`}
+                                className="text-sm text-gray-900"
+                              >
+                                Yes
+                              </label>
+                            </div>
+                            <div className="flex items-center">
+                              <Field
+                                type="radio"
+                                id={`womenDetails.${index}.continueEducation`}
+                                name={`womenDetails.${index}.continueEducation`}
+                                value="false"
+                                className="mr-2"
+                              />
+                              <label
+                                htmlFor={`womenDetails.${index}.continueEducation`}
+                                className="text-sm text-gray-900"
+                              >
+                                No
+                              </label>
+                            </div>
+                            <ErrorMessage
+                              name={`womenDetails.${index}.continueEducation`}
+                              component="div"
+                              className="text-red-500 text-xs italic"
+                            />
+                          </div>
+                        )}
+
+                      <div className="mb-4">
+                        <label className="block mb-2 text-sm font-medium text-gray-900">
+                          Do they have a Voter ID?
+                        </label>
+                        <div className="flex items-center">
+                          <Field
+                            type="radio"
+                            id={`womenDetails.${index}.voterID`}
+                            name={`womenDetails.${index}.voterID`}
+                            value="true"
+                            className="mr-2"
+                          />
+                          <label
+                            htmlFor={`womenDetails.${index}.voterID`}
+                            className="text-sm text-gray-900"
+                          >
+                            Yes
+                          </label>
+                        </div>
+                        <div className="flex items-center">
+                          <Field
+                            type="radio"
+                            id={`womenDetails.${index}.voterID`}
+                            name={`womenDetails.${index}.voterID`}
+                            value="false"
+                            className="mr-2"
+                          />
+                          <label
+                            htmlFor={`womenDetails.${index}.voterID`}
+                            className="text-sm text-gray-900"
+                          >
+                            No
+                          </label>
+                        </div>
+                        <ErrorMessage
+                          name={`womenDetails.${index}.voterID`}
+                          component="div"
+                          className="text-red-500 text-xs italic"
+                        />
+                      </div>
+                      {values.womenDetails[index]?.voterID &&
+                        values.womenDetails[index]?.voterID.toString() ===
+                          "false" && (
+                          <div className="mb-4">
+                            <label
+                              htmlFor={`womenDetails.${index}.voterIDReason`}
+                              className="block mb-2 text-sm font-medium text-gray-900"
+                            >
+                              Reason for not having a Voter ID
+                            </label>
+                            <Field
+                              type="text"
+                              id={`womenDetails.${index}.voterIDReason`}
+                              name={`womenDetails.${index}.voterIDReason`}
+                              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            />
+                            <ErrorMessage
+                              name={`womenDetails.${index}.voterIDReason`}
+                              component="div"
+                              className="text-red-500 text-xs italic"
+                            />
+                          </div>
+                        )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </FieldArray>
+            <div className="mb-4">
+              <label
+                htmlFor="rationCardType"
+                className="block mb-2 text-sm font-medium text-gray-900"
+              >
+                Ration Card Type
+              </label>
+              <Field
+                as="select"
+                id="rationCardType"
+                name="rationCardType"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              >
+                <option value="">Select</option>
+                <option value="APL">APL</option>
+                <option value="BPL">BPL</option>
+              </Field>
+              <ErrorMessage
+                name="rationCardType"
+                component="div"
+                className="text-red-500 text-xs italic"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label
+                htmlFor="governmentAssistance"
+                className="block mb-2 text-sm font-medium text-gray-900"
+              >
+                Government Financial Assistance
+              </label>
+              <Field
+                type="text"
+                id="governmentAssistance"
+                name="governmentAssistance"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              />
+              <ErrorMessage
+                name="governmentAssistance"
+                component="div"
+                className="text-red-500 text-xs italic"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label
+                htmlFor="contactNumber"
+                className="block mb-2 text-sm font-medium text-gray-900"
+              >
+                Contact Number
+              </label>
+              <Field
+                type="text"
+                id="contactNumber"
+                name="contactNumber"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              />
+              <ErrorMessage
+                name="contactNumber"
+                component="div"
+                className="text-red-500 text-xs italic"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-2 text-sm font-medium text-gray-900">
+                Do they have Udyog Yojana Card?
+              </label>
+              <div className="flex items-center">
+                <Field
+                  type="radio"
+                  id="hasUdyogYojanaCard"
+                  name="hasUdyogYojanaCard"
+                  value="true"
+                  className="mr-2"
+                />
+                <label
+                  htmlFor="hasUdyogYojanaCard"
+                  className="text-sm text-gray-900"
+                >
+                  Yes
+                </label>
+              </div>
+              <div className="flex items-center">
+                <Field
+                  type="radio"
+                  id="hasUdyogYojanaCard"
+                  name="hasUdyogYojanaCard"
+                  value="false"
+                  className="mr-2"
+                />
+                <label
+                  htmlFor="hasUdyogYojanaCard"
+                  className="text-sm text-gray-900"
+                >
+                  No
+                </label>
+              </div>
+              <ErrorMessage
+                name="hasUdyogYojanaCard"
+                component="div"
+                className="text-red-500 text-xs italic"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Submit
+            </button>
+          </Form>
+        )}
+      </Formik>
+    </div>
   );
 }
