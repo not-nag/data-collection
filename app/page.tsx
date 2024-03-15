@@ -4,8 +4,32 @@ import { Formik, Form, Field, ErrorMessage, FieldArray } from "formik";
 import * as Yup from "yup";
 import { toast } from "sonner";
 import { Toaster } from "sonner";
+import { saveAs } from "file-saver";
 import AddData from "@/actions/AddData";
-import Link from "next/link";
+import GetData from "@/actions/GetData";
+import { writeToExcel } from "@/actions/WriteToExcel";
+
+interface Person {
+  id: string;
+  numberOfPeople: number;
+  hasUdyogYojanaCard: string;
+  numberOfWomen: number;
+  numberOfVoterID: number;
+  contactNumber: string;
+  numberOfGirlChild: number;
+  governmentAssistance: string;
+  doorNumber: string;
+  womenDetails: {
+    name: string;
+    dropout: string;
+    voterID: string;
+    continueEducation?: string;
+    educationQualification?: string;
+    voterIDReason?: string;
+    dropoutReason?: string;
+  }[];
+  rationCardType: string;
+}
 
 export default function SurveyForm() {
   const validationSchema = Yup.object({
@@ -18,8 +42,12 @@ export default function SurveyForm() {
       .notRequired()
       .integer("Must be a whole number")
       .min(0, "Number of Voter IDs cannot be negative"),
+    numberOfGirlChild: Yup.number()
+      .required("Number of girl child in the house is required")
+      .positive("Must be a positive number")
+      .min(0, "Number of women cannot be negative"),
     numberOfWomen: Yup.number()
-      .notRequired()
+      .required("Number of women in the house is required")
       .positive("Must be a positive number")
       .min(0, "Number of women cannot be negative"),
     womenDetails: Yup.array().of(
@@ -75,6 +103,7 @@ export default function SurveyForm() {
     numberOfPeople: string;
     numberOfVoterID: number;
     numberOfWomen: number;
+    numberOfGirlChild: number;
     womenDetails: WomanDetails[];
     rationCardType: string;
     governmentAssistance: string;
@@ -85,12 +114,40 @@ export default function SurveyForm() {
     numberOfPeople: "",
     numberOfVoterID: 0,
     numberOfWomen: 0,
+    numberOfGirlChild: 0,
     womenDetails: [],
     rationCardType: "",
     governmentAssistance: "",
     contactNumber: "",
     hasUdyogYojanaCard: false,
   };
+
+  function generateExcel() {
+    toast.promise(GetData, {
+      loading: "Fetching Data...",
+      success: (data) => {
+        toast.promise(writeToExcel(data as Person[]), {
+          loading: "Converting to Excel...",
+          success: (data) => {
+            const blob = new Blob([data], {
+              type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            });
+
+            const url = window.URL.createObjectURL(blob);
+
+            saveAs(blob, "RuralData.xlsx");
+
+            window.URL.revokeObjectURL(url);
+
+            return "Excel created Successfully";
+          },
+          error: "Could not convert to Excel.",
+        });
+        return "Excel created Successfully";
+      },
+      error: "Could not fetch data.",
+    });
+  }
   return (
     <div className="flex justify-center items-start h-screen my-4">
       <Toaster position="top-center" />
@@ -101,11 +158,12 @@ export default function SurveyForm() {
       >
         {({ values }) => (
           <Form className="bg-[#fefefe] shadow-md rounded px-8 pt-6 pb-8 mb-4 max-w-lg mx-auto">
-            <Link href="/view">
-              <p className="text-gray-900 text-right text-sm underline underline-offset-4 ">
-                View Data
-              </p>
-            </Link>
+            <p
+              className="text-gray-900 text-right text-sm underline underline-offset-4 "
+              onClick={generateExcel}
+            >
+              View Data
+            </p>
             <h1 className="text-2xl text-gray-900 font-semibold pb-6">
               Rural Data Collection
             </h1>
@@ -164,6 +222,26 @@ export default function SurveyForm() {
               />
               <ErrorMessage
                 name="numberOfVoterID"
+                component="div"
+                className="text-red-500 text-xs italic"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label
+                htmlFor="numberOfGirlChild"
+                className="block mb-2 text-sm font-medium text-gray-900 "
+              >
+                Number of Girl Child in the house
+              </label>
+              <Field
+                type="number"
+                id="numberOfGirlChild"
+                name="numberOfGirlChild"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+              />
+              <ErrorMessage
+                name="numberOfGirlChild"
                 component="div"
                 className="text-red-500 text-xs italic"
               />
