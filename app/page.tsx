@@ -76,7 +76,7 @@ export default function SurveyForm() {
     ),
     rationCardType: Yup.string().required("Ration Card Type is required"),
     governmentAssistance: Yup.string().notRequired(),
-    contactNumber: Yup.string().required("Contact Number is required"),
+    contactNumber: Yup.string().notRequired(),
     hasUdyogYojanaCard: Yup.boolean().required("Udyog Yojana Card is required"),
   });
 
@@ -558,7 +558,7 @@ export default function SurveyForm() {
                 htmlFor="contactNumber"
                 className="block mb-2 text-sm font-medium text-gray-900"
               >
-                Contact Number
+                Contact Number ( having Digital facility like GPay )
               </label>
               <Field
                 type="text"

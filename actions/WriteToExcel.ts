@@ -26,14 +26,15 @@ interface Person {
 export async function writeToExcel(data: Person[]): Promise<Blob> {
   const headers = [
     "Door Number",
-    "Number of People",
-    "Has Udyog Yojana Card",
-    "Number of Women",
-    "Number of Voter ID",
+    "Number of People in the House",
+    "Number of People with Voter ID",
+    "Number of People with Voter ID",
     "Contact Number",
     "Number of Girl Child",
     "Government Assistance",
     "Ration Card Type",
+    "Has Udyog Yojana Card",
+    "Number of Women",
     "Name: Women Details",
     "Dropout",
     "Voter ID",
@@ -49,13 +50,13 @@ export async function writeToExcel(data: Person[]): Promise<Blob> {
     const personData = [
       person.doorNumber,
       person.numberOfPeople,
-      person.hasUdyogYojanaCard,
-      person.numberOfWomen,
       person.numberOfVoterID,
       person.contactNumber,
       person.numberOfGirlChild,
       person.governmentAssistance,
       person.rationCardType,
+      person.hasUdyogYojanaCard,
+      person.numberOfWomen,
       "", // Placeholder for Women Details: Name
       "", // Placeholder for Women Details: Dropout
       "", // Placeholder for Women Details: Voter ID
