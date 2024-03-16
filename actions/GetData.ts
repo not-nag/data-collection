@@ -1,3 +1,5 @@
+"use client";
+
 import { toast } from "sonner";
 import { app } from "../firebase";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
