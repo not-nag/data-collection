@@ -445,6 +445,7 @@ export default function Form() {
           <p>Nagraj</p>
           <p>Final Year</p>
           <p>CSE Dept.</p>
+          <p>Canara Engineering</p>
         </div>
       </div>
     </div>
