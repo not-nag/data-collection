@@ -14,6 +14,7 @@ export default function Form() {
     const doorNumber = formData.get("doorNumber");
     const countOf18Above = formData.get("countOf18Above");
     const numberOfWomen = formData.get("numberOfWomen");
+    const countOfGraduatedWomen = formData.get("countOfGraduatedWomen");
     const numberOfDroppedWomen = formData.get("numberOfDroppedWomen");
     const unemployedWomen = formData.get("unemployedWomen");
     const reason = formData.get("reason");
@@ -38,6 +39,7 @@ export default function Form() {
         doorNumber,
         countOf18Above,
         numberOfWomen,
+        countOfGraduatedWomen,
         numberOfDroppedWomen,
         unemployedWomen,
         reason,
@@ -148,6 +150,21 @@ export default function Form() {
               type="number"
               id="numberOfWomen"
               name="numberOfWomen"
+              className="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+              required
+            />
+          </div>
+          <div className="mb-5 ">
+            <label
+              htmlFor="countOfGraduatedWomen"
+              className="block mb-2  font-medium text-gray-900"
+            >
+              Count of Graduated women.
+            </label>
+            <input
+              type="number"
+              id="countOfGraduatedWomen"
+              name="countOfGraduatedWomen"
               className="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
               required
             />
