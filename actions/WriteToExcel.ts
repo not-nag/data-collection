@@ -37,7 +37,7 @@ export async function WriteToExcel(data: any): Promise<Blob> {
     person.countOfVoterID,
     person.countOfHigherStudies,
     person.countOfSSLCStudents,
-    person.nameOfSSLCInstitutions,
+    person.nameOfSSLCInstitution,
     person.countOfChildren,
     person.nameOfInstitutions,
     person.classOfStudents,
