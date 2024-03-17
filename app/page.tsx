@@ -11,7 +11,13 @@ export default function Form() {
   const [key, setKey] = useState(1);
 
   async function submitForm(formData: FormData) {
+    const doorNumber = formData.get("doorNumber");
     const countOf18Above = formData.get("countOf18Above");
+    const numberOfWomen = formData.get("numberOfWomen");
+    const numberOfDroppedWomen = formData.get("numberOfDroppedWomen");
+    const unemployedWomen = formData.get("unemployedWomen");
+    const reason = formData.get("reason");
+    const intentionToContinue = formData.get("intentionToContinue");
     const countOfVoterID = formData.get("countOfVoterID");
     const countOfHigherStudies = formData.get("countOfHigherStudies");
     const countOfSSLCStudents = formData.get("countOfSSLCStudents");
@@ -29,7 +35,13 @@ export default function Form() {
 
     toast.promise(
       AddData({
+        doorNumber,
         countOf18Above,
+        numberOfWomen,
+        numberOfDroppedWomen,
+        unemployedWomen,
+        reason,
+        intentionToContinue,
         countOfVoterID,
         countOfHigherStudies,
         countOfSSLCStudents,
@@ -97,6 +109,21 @@ export default function Form() {
         <form className="text-lg" action={submitForm} key={key}>
           <div className="mb-5 ">
             <label
+              htmlFor="doorNumber"
+              className="block mb-2  font-medium text-gray-900"
+            >
+              Door Number
+            </label>
+            <input
+              type="text"
+              id="doorNumber"
+              name="doorNumber"
+              className="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+              required
+            />
+          </div>
+          <div className="mb-5 ">
+            <label
               htmlFor="countOf18Above"
               className="block mb-2  font-medium text-gray-900"
             >
@@ -107,6 +134,83 @@ export default function Form() {
               id="countOf18Above"
               name="countOf18Above"
               className="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+              required
+            />
+          </div>
+          <div className="mb-5 ">
+            <label
+              htmlFor="numberOfWomen"
+              className="block mb-2  font-medium text-gray-900"
+            >
+              Count of women in the house.
+            </label>
+            <input
+              type="number"
+              id="numberOfWomen"
+              name="numberOfWomen"
+              className="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+              required
+            />
+          </div>
+          <div className="mb-5 ">
+            <label
+              htmlFor="numberOfDroppedWomen"
+              className="block mb-2  font-medium text-gray-900"
+            >
+              Count of women who dropped out of education.
+            </label>
+            <input
+              type="number"
+              id="numberOfDroppedWomen"
+              name="numberOfDroppedWomen"
+              className="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+              required
+            />
+          </div>
+          <div className="mb-5 ">
+            <label
+              htmlFor="unemployedWomen"
+              className="block mb-2  font-medium text-gray-900"
+            >
+              Count of unemployed women even after graduation.
+            </label>
+            <input
+              type="number"
+              id="unemployedWomen"
+              name="unemployedWomen"
+              className="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+              required
+            />
+          </div>
+          <div className="mb-5 ">
+            <label
+              htmlFor="reason"
+              className="block mb-2  font-medium text-gray-900"
+            >
+              Reasons for droppping out. (Comma separated values)
+            </label>
+            <input
+              type="text"
+              id="reason"
+              name="reason"
+              className="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+              placeholder="ReasonA, ReasonB..."
+              required
+            />
+          </div>
+          <div className="mb-5 ">
+            <label
+              htmlFor="intentionToContinue"
+              className="block mb-2  font-medium text-gray-900"
+            >
+              If dropped out, Any intention to continue education ?
+            </label>
+            <input
+              type="text"
+              id="intentionToContinue"
+              name="intentionToContinue"
+              className="bg-gray-50 border border-gray-300 text-gray-900  rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+              placeholder="ReasonA, ReasonB..."
               required
             />
           </div>
@@ -337,6 +441,11 @@ export default function Form() {
             Submit
           </button>
         </form>
+        <div className="text-right text-[#7b7a7a] mt-4">
+          <p>Nagraj</p>
+          <p>Final Year</p>
+          <p>CSE Dept.</p>
+        </div>
       </div>
     </div>
   );

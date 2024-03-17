@@ -3,7 +3,13 @@ import * as XLSX from "xlsx";
 
 export async function WriteToExcel(data: any): Promise<Blob> {
   const headers = [
+    "Door Number",
     "Count of people aged 18 and above",
+    "Count of Women",
+    "Count of Women who dropped out",
+    "Count of unemployed Women",
+    "Reason for Dropping out",
+    "Intention to continue education?",
     "Count of people having Voter ID",
     "Count of people pursuing Higher studies",
     "Count of students appearing for SSLC Board exam in 2024",
@@ -21,7 +27,13 @@ export async function WriteToExcel(data: any): Promise<Blob> {
   ];
 
   const excelData = data.map((person: any) => [
+    person.doorNumber,
     person.countOf18Above,
+    person.numberOfWomen,
+    person.numberOfDroppedWomen,
+    person.unemployedWomen,
+    person.reason,
+    person.intentionToContinue,
     person.countOfVoterID,
     person.countOfHigherStudies,
     person.countOfSSLCStudents,
